@@ -50,4 +50,47 @@ Test suite Materiallogindemo_LoginPage
 
 
 Test suite Materiallogindemo_RegistrationPage
-	
+	TestCase 1: Register with nothing filled
+		Steps:Clear out the user and pass fields. Press login
+		Expectation: User is notified that there is no valid email and no password enterd
+	TestCase2:Register with invalid email
+		Steps, Enter an invalid email adress(anything that isnt text@moretext.domain)
+		Expectation: User is notified that email is not valid
+	TestCase3: Register with valid email but no pass
+		Steps: Enter valid email, without password
+		Expectation: User is notified to enter a password
+	Testcase4: Register with pass to short
+		Steps:Enter "Notreal@fake.com" as user and "123" as pass
+		Expectation: User is notified that pass needs to be between 4-10 alpha-numeric characters
+	Testcase5: register with with pass too long
+		Steps:Enter "Notreal@fake.com" as user and "1234567890a" as pass
+		Expectation: User is notified that pass needs to be between 4-10 alpha-numeric characters
+	Testcase6: register with pass with non alpha numberic
+		Steps: Enter "Notreal@fake.com" as user and "1234abcd!" as pass
+		Expectation: User is notified that pass needs to be between 4-10 alpha-numeric character
+	testcase 6a-?
+		repeat 6 with all keyboard enterable non-alphanumeric chars
+	TestCase 7: register with Non English Alpha numeric chars
+		Steps, test use of non english chars in both email and pass, per language app supports
+	Testcase 7: Register with no name
+Steps: Enter valid info except name
+Expectation: Told to enter name
+TestCase8: Register with no address
+Steps:enter valid info except address  
+Expecitation: told to enter address
+	Testcase 9: Register with passwords that don’t mathc
+		Steps enter valid info but non matching passwords
+		Expectation told to enter matching passwords
+	Test case 10 register with invalid phone
+		Steps:enter valid info except phone
+Expecitation: told to enter valid phone
+	Test case 11:  Pressing back closes opens login screen
+		Steps: Press back to close keyboard. Pressing returns to login screen
+Test case 12: Clicking text entry fields brings up keyboard
+	Test case 13:stress test clicking
+		Steps, click around the app checkig for crashes or unexpected behavior
+		Run monkey excerciser
+	Test case 14: Pressing create account multiple times with will not register multiple accounts
+		Steps, enter invalid credntials. Press login a few dozen times. 
+		Expectations, notficiations keep popping up but nothing else happens.
+	Test Case 15: registering with valid data will log you in

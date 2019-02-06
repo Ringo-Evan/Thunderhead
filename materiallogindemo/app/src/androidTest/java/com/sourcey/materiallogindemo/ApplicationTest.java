@@ -2,6 +2,7 @@ package com.sourcey.materiallogindemo;
 
 import android.app.Application;
 import android.support.design.widget.TextInputLayout;
+import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -17,10 +18,22 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static android.app.PendingIntent.getActivity;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.*;
 import static android.support.test.espresso.assertion.ViewAssertions.*;
+import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.*;
+import static com.sourcey.materiallogindemo.Support_Class.*;
+
+
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.core.Is.is;
 
 
 /**
@@ -37,52 +50,130 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     @Test
-    public void listGoesOverTheFold() {
-        ViewInteraction PassInput = onView(withChild(withChild(withId(R.id.input_password))));//.check(matches(isDisplayed()));
-        PassInput.check(matches(hasTextInputLayoutHintText("Password")));
+    /*
+    Check that text boxes display proper hints.
+     */
+    public void checkHints(){
+
+        //Hints in the Edittext aren't showing. Need to grab from parent
+        ViewInteraction PassInputBox = onView(withChild(withChild(withId(R.id.input_password))));//.check(matches(withHint("Password")));
+        PassInputBox.check(matches(hasTextInputLayoutHintText("Password")));
+
+        ViewInteraction emailInputBox = onView(withChild(withChild(withId(R.id.input_email))));
+        emailInputBox.check(matches(hasTextInputLayoutHintText("Email")));
+
+        //Check that displays after click
+        ViewInteraction emailInputEditText = onView(withId(R.id.input_email));
+        emailInputBox.perform(click());
+        emailInputBox.check(matches(hasTextInputLayoutHintText("Email")));
+
+        ViewInteraction passInputBox = onView(withId(R.id.input_password)).perform(click());
+        PassInputBox.check(matches(hasTextInputLayoutHintText("Password")));
+
+
 
         //PassInput.perform(scrollTo(), replaceText("ifyug"),closeSoftKeyboard());
     }
 
+    @Test
+    public void noPassCheck() {
 
+        //When pass input is empty a warning will show
+        addInputText(R.id.input_email, "users@asdfa.com");
+        clearInputText(R.id.input_password);
+        login();
+        checkPassWarning();
+
+    }
 
     @Test
-    public void emailCheck() {
-        ViewInteraction emailInput = onView(withId(R.id.input_email));
-        emailInput.perform(replaceText("Delete Me"),closeSoftKeyboard());
-        emailInput.perform(clearText());
+    public void shortPassCheck() {
 
-        ViewInteraction loginButton = onView(withId(R.id.btn_login));
-        loginButton.perform(click());
+        //When pass input is too short a warning will show
+        addInputText(R.id.input_email, "users@asdfa.com");
+        addInputText(R.id.input_password, "abc");
+        login();
+        checkPassWarning();
+
     }
-    //Code modified from
-    //https://stackoverflow.com/a/38874162/621621
-    public static Matcher<View> hasTextInputLayoutHintText(final String expectedErrorText) {
-        return new TypeSafeMatcher<View>() {
 
-            @Override
-            public boolean matchesSafely(View view) {
-                if (!(view instanceof TextInputLayout)) {
-                    return false;
-                }
+    @Test
+    public void longPassCheck() {
 
-                CharSequence error = ((TextInputLayout) view).getHint();
+        //When pass input is too long warning will show
+        addInputText(R.id.input_email, "users@asdfa.com");
+        addInputText(R.id.input_password, "0123456789a");
+        login();
+        checkPassWarning();
 
-
-                if (error == null) {
-                    return false;
-                }
-
-                String hint = error.toString();
-
-                return expectedErrorText.equals(hint);
-            }
-
-            @Override
-            public void describeTo(Description description) {
-            }
-        };
     }
+
+    @Test
+    public void badEmailCheck(){
+        addInputText(R.id.input_password, "abcd1234");
+        addInputText(R.id.input_email, "users@asdfa");
+        login();
+        checkEmailWarning();
+    }
+
+    @Test
+    public void noEmailCheck() {
+
+        addInputText(R.id.input_password, "abcd1234");
+        clearInputText(R.id.input_email);
+        login();
+        checkEmailWarning();
+
+    }
+
+    @Test
+    public void nonAlphaNumericPass()
+    {
+        ///When pass input contains bad input will be warned
+        //TODO implent a fix for this in the code. Known Failure
+        addInputText(R.id.input_email, "users@asdfa.com");
+        addInputText(R.id.input_password, "!01267!");
+        login();
+        checkPassWarning();
+    }
+
+    @Test
+    //TODO implement a database to pull from
+    //TODO Blocked because dev have not impleented database or auth methods
+    public void loginWithRegUser() throws InterruptedException {
+        addInputText(R.id.input_password, "1234abcd");
+        addInputText(R.id.input_email, "Ringo.Evan@gmail.com");
+        login();
+        //onView(withText(("Authenticating..."))).check(matches(isDisplayed()));
+        //waitId("Hello world!", 5000);
+
+        //TODO Fix crappy code. When the activity finishes root is lost, so need to implement a different wait method.
+        //TODO look into intended, Idilingresource, Or custom solution that refreshes the view being queried?
+        Thread.sleep(10000);
+        //onView(withText("Hello world!")).check(matches(isDisplayed()));
+        onView(isRoot()).perform(waitId("Hello world!", 10000));
+    }
+
+    @Test
+    //TODO implement a database to pull from
+    //TODO Blocked because dev have not impleented database or auth methods
+    //TODO This will
+    public void loginWithRegUser_withBadPass() {
+        addInputText(R.id.input_password, "12345");
+        addInputText(R.id.input_email, "Ringo.Evan@gmail.com");
+        login();
+
+        //should this be checking for a toast
+        onView(withText("Login Failed")).inRoot(withDecorView(not(is(mActivityTestRule.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
+        //onView(withText(("Authenticating..."))).check(matches(isDisplayed()));
+        //waitId("Hello world!", 5000);
+
+        //onView(isRoot()).perform(waitId("Hello world!", 10000));
+    }
+
+
+
+
 
 }
 
