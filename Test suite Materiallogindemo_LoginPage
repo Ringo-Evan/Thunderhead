@@ -1,0 +1,53 @@
+Test suite Materiallogindemo_LoginPage
+	TestCase 1: Log in with nothing filled
+		Steps:Clear out the user and pass fields. Press login
+		Expectation: User is notified that there is no valid email and no password enterd
+	TestCase2: Log in with invalid email
+		Steps, Enter an invalid email adress(anything that isnt text@moretext.domain)
+		Expectation: User is notified that email is not valid
+	TestCase3: Log in with valid email but no pass
+		Steps: Enter valid email, without password
+		Expectation: User is notified to enter a password
+	Testcase4: Log in with valid email and pass, that hasn't been registerd
+		Steps: Enter "Notreal@fake.com" as user and "1234abcd" as pass
+		Expectation: User is notified authentication failed
+	TestCase5: Log in with pass to short
+		Steps:Enter "Notreal@fake.com" as user and "123" as pass
+		Expectation: User is notified that pass needs to be between 4-10 alpha-numeric characters
+	Testcase6: Log in with pass too long
+		Steps:Enter "Notreal@fake.com" as user and "1234567890a" as pass
+		Expectation: User is notified that pass needs to be between 4-10 alpha-numeric characters
+	Testcase7: Log in with pass with non alpha numberic
+		Steps: Enter "Notreal@fake.com" as user and "1234abcd!" as pass
+		Expectation: User is notified that pass needs to be between 4-10 alpha-numeric character
+	testcase 7a-?
+		repeat 7 with all keyboard enterable non-alphanumeric chars
+	TestCase 8: Log in with Non English Alpha numeric chars
+		Steps, test use of non english chars in both email and pass, per language app supports
+	Testcase 9: Log in with registered user
+		Precondition: add "Register@user.com" to the database with password "1234abcd"(TODO:Research how are passwords stored? Develope User data protection tests?)
+		Steps: Enter "Register@user.com" as user and "1234abcd" as password. Press login
+		Expectation": User is taken to login page
+	TestCase 10: Log in with registerd user and bad pass
+		Precondition: add "Register@user.com" to the database with password "1234abcd"
+		Steps: Enter "Register@user.com" as user and "1234a" as password. Press login
+		Expectation: User is informed auth fails. 
+	Testcase 11: Pressing back closes app
+		Steps: Press back to close keyboard. Pressing again closes app
+	Testcase 12:Integration with password managers?
+		Steps: get list of popular password managers. See if they can save passwords and if they can inject into app.
+	Test case 13: Clicking text entry fields brings up keyboard
+	Test case 14:stress test clicking
+		Steps, click around the app checkig for crashes or unexpected behavior
+		Run monkey excerciser
+	Test case 15: Pressing login multiple times with invalid data will not clear fields or produce unexpect results
+		Steps, enter invalid credntials. Press login a few dozen times. 
+		Expectations, notficiations keep popping up but nothing else happens.
+	Test Case 16: Pressing login multipe times with valid data will login once and not send multiple requests to server
+	Test case 17: Clicking on email and pass notifications will display messages
+	Test case 18: Click on no account yet will take user to registration page
+	Test case 19: Clicking on No account yet with credentials entered will take user to registraion page and pre-fill those fields
+
+
+Test suite Materiallogindemo_RegistrationPage
+	
